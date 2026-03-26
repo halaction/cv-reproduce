@@ -194,7 +194,9 @@ def evaluate(
     )
 
 
-def get_transforms(use_strong_aug: bool = False) -> tuple[transforms.Compose, transforms.Compose]:
+def get_transforms(
+    use_strong_aug: bool = False,
+) -> tuple[transforms.Compose, transforms.Compose]:
     if use_strong_aug:
         train_transform = transforms.Compose(
             [
