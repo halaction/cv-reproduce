@@ -10,6 +10,7 @@ import torch.optim as optim
 from dotenv import load_dotenv
 from timm import create_model
 from torch.utils.data import DataLoader
+from tqdm.auto import tqdm, trange
 from torchvision import datasets, transforms
 
 
@@ -123,6 +124,7 @@ def train_one_epoch(
     criterion: nn.Module,
     optimizer: optim.Optimizer,
     device: torch.device,
+    epoch: int,
     grad_clip: float | None = None,
 ) -> EpochResult:
     model.train()
@@ -132,7 +134,12 @@ def train_one_epoch(
     running_correct = 0
     running_total = 0
 
-    for images, targets in loader:
+    for images, targets in tqdm(
+        loader,
+        desc=f"Train {epoch:03d}",
+        leave=False,
+        dynamic_ncols=True,
+    ):
         images = images.to(device)
         targets = targets.to(device)
 
@@ -166,6 +173,7 @@ def evaluate(
     loader: DataLoader,
     criterion: nn.Module,
     device: torch.device,
+    epoch: int,
 ) -> EpochResult:
     model.eval()
     start_time = time.time()
@@ -174,7 +182,12 @@ def evaluate(
     running_correct = 0
     running_total = 0
 
-    for images, targets in loader:
+    for images, targets in tqdm(
+        loader,
+        desc=f"Eval  {epoch:03d}",
+        leave=False,
+        dynamic_ncols=True,
+    ):
         images = images.to(device)
         targets = targets.to(device)
 
@@ -426,13 +439,16 @@ def main() -> None:
     best_test_acc = 0.0
     wandb_run = maybe_init_wandb(args=args, device=device, param_count=param_count)
 
-    for epoch in range(1, args.epochs + 1):
+    epoch_iterator = trange(1, args.epochs + 1, desc="Epochs", dynamic_ncols=True)
+
+    for epoch in epoch_iterator:
         train_result = train_one_epoch(
             model=model,
             loader=train_loader,
             criterion=criterion,
             optimizer=optimizer,
             device=device,
+            epoch=epoch,
             grad_clip=args.grad_clip,
         )
         test_result = evaluate(
@@ -440,6 +456,7 @@ def main() -> None:
             loader=test_loader,
             criterion=criterion,
             device=device,
+            epoch=epoch,
         )
 
         scheduler.step()
@@ -465,6 +482,11 @@ def main() -> None:
             f"test_acc={test_result.accuracy:.4f} | "
             f"train_time={train_result.epoch_time_sec:.1f}s | "
             f"eval_time={test_result.epoch_time_sec:.1f}s"
+        )
+        epoch_iterator.set_postfix(
+            train_acc=f"{train_result.accuracy:.4f}",
+            test_acc=f"{test_result.accuracy:.4f}",
+            lr=f"{current_lr:.2e}",
         )
 
         if wandb_run is not None:
