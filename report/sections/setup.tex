@@ -1,0 +1,19 @@
+\section{Experimental Setup}
+
+\paragraph{Dataset.}
+All current experiments use CIFAR-10 \citep{krizhevsky2009learning}, a 10-class natural image benchmark with $32 \times 32$ inputs. This dataset is substantially smaller and lower-resolution than the settings emphasized in the original ConvMixer paper, so the present study should be read as a compact reproduction under limited compute rather than a direct scale-matched replication.
+
+\paragraph{Models.}
+The target architecture is ConvMixer with the default project configuration implemented in the repository: hidden dimension $256$, depth $8$, kernel size $5$, and patch size $2$. Two additional baselines are trained through the same script interface: ResNet18 and DeiT-Tiny. The latter two are instantiated via \texttt{timm} \citep{wightman2019timm}, while ConvMixer is implemented directly in the repository in a small custom module.
+
+\paragraph{Training pipeline.}
+The project uses a shared trainer written in PyTorch. Runs are launched through a single command-line entry point, with optimizer, scheduler, logging, and checkpointing unified across models. The current trainer uses AdamW, cosine annealing over the configured epoch horizon, a batch size of 128 by default, and a fixed random seed of 42. Weights \& Biases is used for metric logging, model comparison, and run tracking. Project dependencies are managed with \texttt{uv}.
+
+\paragraph{Reproduction philosophy.}
+The implementation deliberately favors one transparent training path over model-specific tuning. This keeps the comparison easy to inspect and helps separate architecture-level behavior from engineering variance. The downside is that a shared trainer is not guaranteed to be equally favorable to all three models, especially when a transformer-style model such as DeiT-Tiny is evaluated on a small low-resolution benchmark without the large-scale recipe for which it was originally designed.
+
+\paragraph{Implementation notes.}
+The current codebase also includes planned ablation variants for ConvMixer: a convolutional replacement for the patch stem, a non-linear channel mixer replacing the original pointwise convolution, an identity-based no-channel-mixing variant, and a reduced-data protocol. These ablations are already exposed through the training script, but only the main experiment is reported quantitatively in this draft.
+
+\paragraph{Hardware and runtime context.}
+The tracked runs were executed in a lightweight development environment and logged through Weights \& Biases. Some intermediate debugging runs were performed on CPU in Colab-like settings during development. Because the currently compared runs may not be perfectly matched in epoch budget or runtime environment, the main comparison should be treated as informative rather than as a fully controlled benchmark.

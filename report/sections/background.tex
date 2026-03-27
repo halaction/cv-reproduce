@@ -1,0 +1,7 @@
+\section{Paper Background}
+
+ConvMixer is built around three ideas \citep{trockman2022patches}. First, the input image is converted into a patch-level representation by a strided convolutional stem, which plays the role of patch embedding. Second, each block applies \emph{depthwise} convolution to mix information spatially inside each channel. Third, a \emph{pointwise} $1 \times 1$ convolution performs channel mixing. Nonlinearity and batch normalization are inserted between these operations, and the spatial mixing path is wrapped in a residual connection.
+
+This structure is particularly convenient for ablation because the main functions of the architecture are already factorized. The patch stem can be replaced without changing the rest of the network, and the channel mixing stage can be swapped for either a stronger non-linear mixer or a weaker identity mapping while preserving the surrounding block layout.
+
+The baseline choices serve different purposes. ResNet18 \citep{he2016deep} represents a standard convolutional network with residual learning and remains a strong small-scale image baseline. DeiT-Tiny \citep{touvron2021training} provides a compact transformer-family comparison and tests whether a patch-oriented but non-convolutional alternative is competitive on this small dataset. Together, these models help position ConvMixer between classic CNN inductive bias and transformer-style patch processing.

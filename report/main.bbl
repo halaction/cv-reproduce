@@ -1,0 +1,38 @@
+\begin{thebibliography}{5}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[He et~al.(2016)He, Zhang, Ren, and Sun]{he2016deep}
+Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun.
+\newblock Deep residual learning for image recognition.
+\newblock In \emph{Proceedings of the IEEE Conference on Computer Vision and
+  Pattern Recognition}, pages 770--778, 2016.
+
+\bibitem[Krizhevsky(2009)]{krizhevsky2009learning}
+Alex Krizhevsky.
+\newblock Learning multiple layers of features from tiny images.
+\newblock Technical report, University of Toronto, 2009.
+
+\bibitem[Touvron et~al.(2021)Touvron, Cord, Douze, Massa, Sablayrolles, and
+  J{\'e}gou]{touvron2021training}
+Hugo Touvron, Matthieu Cord, Matthijs Douze, Francisco Massa, Alexandre
+  Sablayrolles, and Herv{\'e} J{\'e}gou.
+\newblock Training data-efficient image transformers \& distillation through
+  attention.
+\newblock In \emph{Proceedings of the International Conference on Machine
+  Learning}, pages 10347--10357, 2021.
+
+\bibitem[Trockman and Kolter(2022)]{trockman2022patches}
+Asher Trockman and J.~Zico Kolter.
+\newblock Patches are all you need?
+\newblock \emph{arXiv preprint arXiv:2201.09792}, 2022.
+
+\bibitem[Wightman(2019)]{wightman2019timm}
+Ross Wightman.
+\newblock Pytorch image models.
+\newblock \url{https://github.com/rwightman/pytorch-image-models}, 2019.
+
+\end{thebibliography}

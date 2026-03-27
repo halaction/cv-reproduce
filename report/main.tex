@@ -1,0 +1,69 @@
+\documentclass[10pt,twocolumn]{article}
+
+\usepackage[a4paper,margin=0.7in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{caption}
+\usepackage[numbers]{natbib}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    urlcolor=blue,
+}
+
+\setlength{\columnsep}{18pt}
+\setlength{\parskip}{0.3em}
+\setlength{\parindent}{1em}
+
+\newcommand{\pendingvalue}{\texttt{TBD}}
+
+\newcommand{\convmixeracc}{\pendingvalue}
+\newcommand{\resnetacc}{\pendingvalue}
+\newcommand{\deitacc}{\pendingvalue}
+
+\newcommand{\convmixerepochs}{\pendingvalue}
+\newcommand{\resnetepochs}{\pendingvalue}
+\newcommand{\deitepochs}{\pendingvalue}
+
+\newcommand{\convmixertrainsec}{\pendingvalue}
+\newcommand{\resnettrainsec}{\pendingvalue}
+\newcommand{\deittrainsec}{\pendingvalue}
+
+\newcommand{\convmixerevalsec}{\pendingvalue}
+\newcommand{\resnetevalsec}{\pendingvalue}
+\newcommand{\deitevalsec}{\pendingvalue}
+
+\newcommand{\convmixerparams}{\num{594186}}
+\newcommand{\resnetparams}{\num{11181642}}
+\newcommand{\deitparams}{\num{5489482}}
+
+\title{Reproducing ConvMixer on CIFAR-10:\\Main Benchmark and Planned Ablations}
+\author{Author Name}
+\date{March 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\input{sections/abstract}
+\end{abstract}
+
+\input{sections/introduction}
+\input{sections/background}
+\input{sections/setup}
+\input{sections/results}
+\input{sections/ablations}
+\input{sections/conclusion}
+
+\bibliographystyle{plainnat}
+\bibliography{refs}
+
+\end{document}
