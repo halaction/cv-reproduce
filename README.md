@@ -56,3 +56,25 @@ uv run python experiment/train.py \
   --wandb enable
 ```
 
+Run ConvMixer with patch-to-conv ablation:
+
+```bash
+uv run python experiment/train.py \
+  --model convmixer \
+  --ablation patch_to_conv \
+  --epochs 50 \
+  --batch-size 128 \
+  --wandb enable
+```
+
+Run ConvMixer with MLP channel ablation:
+
+```bash
+uv run python experiment/train.py \
+  --model convmixer \
+  --ablation mlp_channel \
+  --mlp-ratio 4.0 \
+  --epochs 50 \
+  --batch-size 128 \
+  --wandb enable
+```
