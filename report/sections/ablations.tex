@@ -24,6 +24,12 @@ The expected outcome is a noticeable drop in accuracy, which would support the i
 
 \subsection{Data-Size Robustness}
 
-The final planned ablation evaluates the same training pipeline under reduced fractions of the CIFAR-10 training set. This is intended to test whether ConvMixer retains its advantage when the amount of supervision decreases.
+It is assumed that transformers require a bigger amount of data than convolutional networks, when trained from scratch. Not only this claim is supported by the existing research (such as \citep{vitcnnstudy}), there are papers dedicated to bridge this gap (such as \citep{bridginggap}).
 
-The current hypothesis is that smaller-data settings will amplify differences in inductive bias and optimization stability, potentially favoring the convolution-heavy models over DeiT-Tiny. Results will be added after runs complete.
+In fact, it might be that the poor performance of DeiT-Tiny in the main experiment could be attributed to the fact that CIFAR-10 is already a relatively small dataset, compared to ImageNet that was used in the original paper, and other datasets commonly used to teach transformers image classification.
+
+Our final ablation evaluates how convmixer trains when using  smaller amounts of training data, and how it compares to Resnet-18 and DeiT-Tiny in that respect. For this experiment, we take 50\%, 10\% and 1\% of training set of CIFAR-10, and train each of the models on the limited data for 50 epochs. At the same time, we use the whole test dataset.
+
+The results are expected and similar to the main experiment outcome. Of course, the smaller the data, the worse the performance of a model. However, with 50\% of the training set, the fall in test accuracy is not so catastrophic, with models trailing behind by just about 6\% to 7\%. 
+
+Something interesting can be observed when training at just 1\% of data: surprisingly, DeiT-Tiny starts with better accuracy after the first epoch (about 17\% compared to about 10\% for convolutional models) and its training looks more stable. Eventually, after about 20 epochs, the convolutional models do outperform DeiT-Tiny as in other runs.
