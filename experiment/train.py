@@ -38,6 +38,43 @@ class Residual(nn.Module):
         return self.fn(x) + x
 
 
+def build_patch_stem(dim: int, patch_size: int) -> nn.Sequential:
+    return nn.Sequential(
+        nn.Conv2d(
+            in_channels=3,
+            out_channels=dim,
+            kernel_size=patch_size,
+            stride=patch_size,
+        ),
+        nn.GELU(),
+        nn.BatchNorm2d(num_features=dim),
+    )
+
+
+def build_conv_stem(dim: int) -> nn.Sequential:
+    hidden_dim = max(1, dim // 2)
+    return nn.Sequential(
+        nn.Conv2d(
+            in_channels=3,
+            out_channels=hidden_dim,
+            kernel_size=3,
+            stride=1,
+            padding=1,
+        ),
+        nn.GELU(),
+        nn.BatchNorm2d(num_features=hidden_dim),
+        nn.Conv2d(
+            in_channels=hidden_dim,
+            out_channels=dim,
+            kernel_size=3,
+            stride=2,
+            padding=1,
+        ),
+        nn.GELU(),
+        nn.BatchNorm2d(num_features=dim),
+    )
+
+
 class ConvMixer(nn.Module):
     def __init__(
         self,
@@ -46,19 +83,16 @@ class ConvMixer(nn.Module):
         kernel_size: int = 5,
         patch_size: int = 2,
         n_classes: int = 10,
+        stem_type: str = "patch",
     ) -> None:
         super().__init__()
 
-        self.stem = nn.Sequential(
-            nn.Conv2d(
-                in_channels=3,
-                out_channels=dim,
-                kernel_size=patch_size,
-                stride=patch_size,
-            ),
-            nn.GELU(),
-            nn.BatchNorm2d(num_features=dim),
-        )
+        if stem_type == "patch":
+            self.stem = build_patch_stem(dim=dim, patch_size=patch_size)
+        elif stem_type == "conv":
+            self.stem = build_conv_stem(dim=dim)
+        else:
+            raise ValueError(f"Unsupported stem type: {stem_type}")
 
         blocks = []
         for _ in range(depth):
@@ -326,6 +360,12 @@ def parse_args() -> argparse.Namespace:
 
     parser.add_argument("--grad-clip", type=float, default=1.0)
     parser.add_argument("--strong-aug", action="store_true")
+    parser.add_argument(
+        "--ablation",
+        type=str,
+        default="none",
+        choices=("none", "patch_to_conv"),
+    )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--save-path", type=str, default="./checkpoints/convmixer_best.pt")
     parser.add_argument(
@@ -338,14 +378,24 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def validate_args(args: argparse.Namespace) -> None:
+    if args.ablation == "patch_to_conv":
+        if args.model != "convmixer":
+            raise ValueError("--ablation patch_to_conv is only supported for --model convmixer")
+        if args.patch_size != 2:
+            raise ValueError("--ablation patch_to_conv currently requires --patch-size 2")
+
+
 def build_model(args: argparse.Namespace) -> nn.Module:
     if args.model == "convmixer":
+        stem_type = "conv" if args.ablation == "patch_to_conv" else "patch"
         return ConvMixer(
             dim=args.dim,
             depth=args.depth,
             kernel_size=args.kernel_size,
             patch_size=args.patch_size,
             n_classes=10,
+            stem_type=stem_type,
         )
 
     if args.model == "deit_tiny":
@@ -392,6 +442,7 @@ def maybe_init_wandb(args: argparse.Namespace, device: torch.device, param_count
             "patch_size": args.patch_size,
             "grad_clip": args.grad_clip,
             "strong_aug": args.strong_aug,
+            "ablation": args.ablation,
             "seed": args.seed,
             "device": str(device),
             "param_count": param_count,
@@ -403,6 +454,7 @@ def maybe_init_wandb(args: argparse.Namespace, device: torch.device, param_count
 
 def main() -> None:
     args = parse_args()
+    validate_args(args)
     set_seed(args.seed)
     device = get_device()
 
@@ -417,6 +469,12 @@ def main() -> None:
     save_path_default = "./checkpoints/convmixer_best.pt"
     if args.save_path == save_path_default and args.model != "convmixer":
         args.save_path = f"./checkpoints/{args.model}_best.pt"
+    if (
+        args.save_path == save_path_default
+        and args.model == "convmixer"
+        and args.ablation == "patch_to_conv"
+    ):
+        args.save_path = "./checkpoints/convmixer_patch_to_conv_best.pt"
 
     model = build_model(args).to(device)
 
