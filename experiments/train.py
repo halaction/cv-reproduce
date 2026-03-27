@@ -7,18 +7,18 @@ import torch.optim as optim
 from dotenv import load_dotenv
 from timm import create_model
 
-from experiment.ablations.mlp_channel import (
+from experiments.ablations.mlp_channel import (
     add_mlp_args,
     build_convmixer_mlp_channel,
     infer_mlp_save_path,
     validate_mlp_args,
 )
-from experiment.ablations.patch_to_conv import (
+from experiments.ablations.patch_to_conv import (
     build_convmixer_patch_to_conv,
     validate_patch_to_conv_args,
 )
-from experiment.convmixer_models import build_convmixer
-from experiment.train_utils import (
+from experiments.convmixer_models import build_convmixer
+from experiments.train_utils import (
     count_parameters,
     evaluate,
     get_device,

@@ -2,7 +2,7 @@ import argparse
 
 import torch.nn as nn
 
-from experiment.convmixer_models import ConvMixer
+from experiments.convmixer_models import ConvMixer
 
 
 def build_patch_to_conv_stem(dim: int) -> nn.Sequential:

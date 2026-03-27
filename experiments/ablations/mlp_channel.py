@@ -3,7 +3,7 @@ import argparse
 import torch
 import torch.nn as nn
 
-from experiment.convmixer_models import Residual, build_patch_stem
+from experiments.convmixer_models import Residual, build_patch_stem
 
 
 class ChannelMLP(nn.Module):
@@ -13,8 +13,7 @@ class ChannelMLP(nn.Module):
         hidden_dim = int(dim * mlp_ratio)
         if hidden_dim < dim:
             raise ValueError(
-                f"mlp_ratio={mlp_ratio} gives hidden_dim={hidden_dim}, "
-                f"but hidden_dim must be >= dim={dim}."
+                f"mlp_ratio={mlp_ratio} gives hidden_dim={hidden_dim}, but hidden_dim must be >= dim={dim}."
             )
 
         self.net = nn.Sequential(

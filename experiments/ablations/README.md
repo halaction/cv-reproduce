@@ -2,7 +2,7 @@
 
 Reproduced paper: https://arxiv.org/pdf/2201.09792
 
-Main experiment: Running Convmixer, ResNet and ViT on CIFAR10.
+Main experiments: Running Convmixer, ResNet and ViT on CIFAR10.
 
 Ablations:
 1) Partial dataset - running the same models only with the part of CIFAR10. It is assumed that target architecture (Convmixer) will show better robustness.
