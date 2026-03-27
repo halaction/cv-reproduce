@@ -7,6 +7,12 @@ import torch.optim as optim
 from dotenv import load_dotenv
 from timm import create_model
 
+from experiments.ablations.data_size import (
+    add_data_size_args,
+    infer_data_size_save_path,
+    make_data_size_loaders,
+    validate_data_size_args,
+)
 from experiments.ablations.mlp_channel import (
     add_mlp_args,
     build_convmixer_mlp_channel,
@@ -49,6 +55,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--kernel-size", type=int, default=5)
     parser.add_argument("--patch-size", type=int, default=2)
     add_mlp_args(parser)
+    add_data_size_args(parser)
 
     parser.add_argument("--grad-clip", type=float, default=1.0)
     parser.add_argument("--strong-aug", action="store_true")
@@ -56,7 +63,7 @@ def parse_args() -> argparse.Namespace:
         "--ablation",
         type=str,
         default="none",
-        choices=("none", "patch_to_conv", "mlp_channel"),
+        choices=("none", "patch_to_conv", "mlp_channel", "data_size"),
     )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--save-path", type=str, default="")
@@ -72,6 +79,7 @@ def parse_args() -> argparse.Namespace:
 
 def validate_args(args: argparse.Namespace) -> None:
     validate_mlp_args(args)
+    validate_data_size_args(args)
 
     if args.ablation == "patch_to_conv":
         validate_patch_to_conv_args(args)
@@ -79,8 +87,8 @@ def validate_args(args: argparse.Namespace) -> None:
     if args.ablation == "mlp_channel" and args.model != "convmixer":
         raise ValueError("--ablation mlp_channel is only supported for --model convmixer")
 
-    if args.model in ("deit_tiny", "resnet18") and args.ablation != "none":
-        raise ValueError("--ablation is only supported for --model convmixer")
+    if args.model in ("deit_tiny", "resnet18") and args.ablation in ("patch_to_conv", "mlp_channel"):
+        raise ValueError("--ablation patch_to_conv/mlp_channel is only supported for --model convmixer")
 
 
 def build_model(args: argparse.Namespace) -> nn.Module:
@@ -112,6 +120,9 @@ def build_model(args: argparse.Namespace) -> nn.Module:
 def infer_save_path(args: argparse.Namespace) -> str:
     if args.save_path:
         return args.save_path
+
+    if args.ablation == "data_size":
+        return infer_data_size_save_path(args)
 
     if args.model == "convmixer":
         if args.ablation == "patch_to_conv":
@@ -154,6 +165,7 @@ def maybe_init_wandb(
             "kernel_size": args.kernel_size,
             "patch_size": args.patch_size,
             "mlp_ratio": args.mlp_ratio,
+            "fraction": args.fraction,
             "grad_clip": args.grad_clip,
             "strong_aug": args.strong_aug,
             "seed": args.seed,
@@ -173,11 +185,24 @@ def main() -> None:
 
     print(f"Using device: {device}")
 
-    train_loader, test_loader = make_loaders(
-        batch_size=args.batch_size,
-        num_workers=args.num_workers,
-        use_strong_aug=args.strong_aug,
-    )
+    if args.ablation == "data_size":
+        train_loader, test_loader = make_data_size_loaders(
+            batch_size=args.batch_size,
+            num_workers=args.num_workers,
+            use_strong_aug=args.strong_aug,
+            fraction=args.fraction,
+            seed=args.seed,
+        )
+        print(
+            "Using data-size ablation with "
+            f"fraction={args.fraction} | train_samples={len(train_loader.dataset)}"
+        )
+    else:
+        train_loader, test_loader = make_loaders(
+            batch_size=args.batch_size,
+            num_workers=args.num_workers,
+            use_strong_aug=args.strong_aug,
+        )
 
     save_path = infer_save_path(args)
     model = build_model(args).to(device)
