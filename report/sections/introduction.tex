@@ -1,0 +1,7 @@
+\section{Introduction}
+
+ConvMixer was proposed as a deliberately simple image model that combines patch-based input processing with convolutional mixing operations \citep{trockman2022patches}. The architecture is interesting because it removes much of the design complexity often associated with both modern convolutional networks and vision transformers, while still preserving separate spatial and channel mixing stages. This makes it a convenient target for a course-scale reproduction: the core model is compact, the implementation is short, and the architectural hypotheses are easy to probe with controlled modifications.
+
+The goal of this project is twofold. First, we reproduce the main ConvMixer idea on CIFAR-10 and compare it against two lightweight but meaningful baselines: ResNet18 as a canonical residual CNN and DeiT-Tiny as a compact transformer-style vision model. Second, we prepare a set of focused ablations that isolate the role of the patch embedding stem and the channel mixing block. At the current stage, the main experiment is complete and logged in Weights \& Biases, while the ablation section is scaffolded and will be populated as the remaining runs finish.
+
+This report is intentionally framed as a constrained reproduction rather than a claim of exact paper-level parity. Our training budget, dataset, and implementation choices differ from the original large-scale setting, so the emphasis is on comparative behavior inside one common experimental pipeline rather than on matching the original headline numbers exactly.

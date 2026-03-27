@@ -1,0 +1,29 @@
+\section{Ablation Study}
+
+The ablation code path is already prepared in the repository, but the full set of runs is still in progress. This section therefore records the intended experimental questions and leaves explicit space for the corresponding quantitative results.
+
+These ablations are not arbitrary extensions. Each one targets a specific component that is easy to isolate in the ConvMixer design: the patch-forming front-end, the expressiveness of channel mixing, and the dependence of the model on training-set size. Together, they are meant to answer whether ConvMixer works well because of the exact combination proposed in the paper or because a broader family of simple patch-and-convolution hybrids is already strong on CIFAR-10.
+
+\subsection{Patch Embedding vs.\ Convolutional Stem}
+
+This ablation replaces the original patch embedding stem with a more conventional convolutional stem that preserves the downstream tensor shape. The goal is to test whether the patch projection itself is an important ingredient of ConvMixer, or whether a standard convolutional front-end can recover most of the same behavior once the later mixing blocks are unchanged.
+
+Our working hypothesis is that the original patch-style stem is likely part of what makes ConvMixer distinctive, but the performance gap may be modest if the replacement stem remains shape-compatible and parameter-comparable. Results will be added after runs complete.
+
+\subsection{Pointwise Channel Mixing vs.\ Non-Linear Channel Mixing}
+
+The base ConvMixer block uses a single $1 \times 1$ convolution for channel mixing. The non-linear channel mixing ablation replaces that stage with a deeper non-linear mixer while keeping the rest of the block structure fixed. This tests whether the original pointwise mixer is sufficient, or whether additional channel-wise capacity materially changes performance.
+
+The expected outcome is that this variant may improve flexibility but does not necessarily improve accuracy enough to justify its added complexity on CIFAR-10. Results will be added after runs complete.
+
+\subsection{Pointwise Channel Mixing vs.\ No Channel Mixing}
+
+This ablation removes the channel mixing stage entirely by replacing it with an identity mapping. It is the cleanest way to test whether the pointwise mixing path is essential, because the spatial depthwise branch and the classifier head remain intact.
+
+The expected outcome is a noticeable drop in accuracy, which would support the interpretation that ConvMixer requires both spatial and channel mixing rather than spatial processing alone. Results will be added after runs complete.
+
+\subsection{Data-Size Robustness}
+
+The final planned ablation evaluates the same training pipeline under reduced fractions of the CIFAR-10 training set. This is intended to test whether ConvMixer retains its advantage when the amount of supervision decreases.
+
+The current hypothesis is that smaller-data settings will amplify differences in inductive bias and optimization stability, potentially favoring the convolution-heavy models over DeiT-Tiny. Results will be added after runs complete.
