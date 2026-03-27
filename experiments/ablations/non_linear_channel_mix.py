@@ -6,7 +6,7 @@ import torch.nn as nn
 from experiments.convmixer_models import Residual, build_patch_stem
 
 
-class ChannelMLP(nn.Module):
+class NonLinearChannelMix(nn.Module):
     def __init__(self, dim: int, mlp_ratio: float = 1.0) -> None:
         super().__init__()
 
@@ -28,7 +28,7 @@ class ChannelMLP(nn.Module):
         return self.net(x)
 
 
-class ConvMixerMLPChannel(nn.Module):
+class ConvMixerNonLinearChannelMix(nn.Module):
     def __init__(
         self,
         dim: int,
@@ -59,7 +59,7 @@ class ConvMixerMLPChannel(nn.Module):
                             nn.BatchNorm2d(num_features=dim),
                         )
                     ),
-                    ChannelMLP(dim=dim, mlp_ratio=mlp_ratio),
+                    NonLinearChannelMix(dim=dim, mlp_ratio=mlp_ratio),
                 )
             )
 
@@ -76,11 +76,11 @@ class ConvMixerMLPChannel(nn.Module):
         return x
 
 
-def add_mlp_args(parser: argparse.ArgumentParser) -> None:
+def add_non_linear_channel_mix_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--mlp-ratio", type=float, default=1.0)
 
 
-def validate_mlp_args(args: argparse.Namespace) -> None:
+def validate_non_linear_channel_mix_args(args: argparse.Namespace) -> None:
     if args.ablation == "non_linear_channel_mix":
         if args.model != "convmixer":
             raise ValueError("--ablation non_linear_channel_mix is only supported for --model convmixer")
@@ -88,8 +88,8 @@ def validate_mlp_args(args: argparse.Namespace) -> None:
         raise ValueError("--mlp-ratio is only supported when --ablation non_linear_channel_mix")
 
 
-def build_convmixer_mlp_channel(args: argparse.Namespace) -> nn.Module:
-    return ConvMixerMLPChannel(
+def build_convmixer_non_linear_channel_mix(args: argparse.Namespace) -> nn.Module:
+    return ConvMixerNonLinearChannelMix(
         dim=args.dim,
         depth=args.depth,
         kernel_size=args.kernel_size,
@@ -99,7 +99,7 @@ def build_convmixer_mlp_channel(args: argparse.Namespace) -> nn.Module:
     )
 
 
-def infer_mlp_save_path(args: argparse.Namespace) -> str:
+def infer_non_linear_channel_mix_save_path(args: argparse.Namespace) -> str:
     return (
         "./checkpoints/"
         f"non_linear_channel_mix_"

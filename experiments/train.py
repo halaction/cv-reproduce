@@ -13,11 +13,15 @@ from experiments.ablations.data_size import (
     make_data_size_loaders,
     validate_data_size_args,
 )
-from experiments.ablations.mlp_channel import (
-    add_mlp_args,
-    build_convmixer_mlp_channel,
-    infer_mlp_save_path,
-    validate_mlp_args,
+from experiments.ablations.non_linear_channel_mix import (
+    add_non_linear_channel_mix_args,
+    build_convmixer_non_linear_channel_mix,
+    infer_non_linear_channel_mix_save_path,
+    validate_non_linear_channel_mix_args,
+)
+from experiments.ablations.no_channel_mix import (
+    build_convmixer_no_channel_mix,
+    validate_no_channel_mix_args,
 )
 from experiments.ablations.patch_to_conv import (
     build_convmixer_patch_to_conv,
@@ -54,7 +58,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--depth", type=int, default=8)
     parser.add_argument("--kernel-size", type=int, default=5)
     parser.add_argument("--patch-size", type=int, default=2)
-    add_mlp_args(parser)
+    add_non_linear_channel_mix_args(parser)
     add_data_size_args(parser)
 
     parser.add_argument("--grad-clip", type=float, default=1.0)
@@ -63,7 +67,7 @@ def parse_args() -> argparse.Namespace:
         "--ablation",
         type=str,
         default="none",
-        choices=("none", "patch_to_conv", "mlp_channel", "data_size"),
+        choices=("none", "patch_to_conv", "non_linear_channel_mix", "no_channel_mix", "data_size"),
     )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--save-path", type=str, default="")
@@ -78,25 +82,35 @@ def parse_args() -> argparse.Namespace:
 
 
 def validate_args(args: argparse.Namespace) -> None:
-    validate_mlp_args(args)
+    validate_non_linear_channel_mix_args(args)
     validate_data_size_args(args)
 
     if args.ablation == "patch_to_conv":
         validate_patch_to_conv_args(args)
+    if args.ablation == "no_channel_mix":
+        validate_no_channel_mix_args(args)
 
-    if args.ablation == "mlp_channel" and args.model != "convmixer":
-        raise ValueError("--ablation mlp_channel is only supported for --model convmixer")
+    if args.ablation == "non_linear_channel_mix" and args.model != "convmixer":
+        raise ValueError("--ablation non_linear_channel_mix is only supported for --model convmixer")
 
-    if args.model in ("deit_tiny", "resnet18") and args.ablation in ("patch_to_conv", "mlp_channel"):
-        raise ValueError("--ablation patch_to_conv/mlp_channel is only supported for --model convmixer")
+    if args.model in ("deit_tiny", "resnet18") and args.ablation in (
+        "patch_to_conv",
+        "non_linear_channel_mix",
+        "no_channel_mix",
+    ):
+        raise ValueError(
+            "--ablation patch_to_conv/non_linear_channel_mix/no_channel_mix is only supported for --model convmixer"
+        )
 
 
 def build_model(args: argparse.Namespace) -> nn.Module:
     if args.model == "convmixer":
         if args.ablation == "patch_to_conv":
             return build_convmixer_patch_to_conv(args)
-        if args.ablation == "mlp_channel":
-            return build_convmixer_mlp_channel(args)
+        if args.ablation == "non_linear_channel_mix":
+            return build_convmixer_non_linear_channel_mix(args)
+        if args.ablation == "no_channel_mix":
+            return build_convmixer_no_channel_mix(args)
         return build_convmixer(args)
 
     if args.model == "deit_tiny":
@@ -127,8 +141,10 @@ def infer_save_path(args: argparse.Namespace) -> str:
     if args.model == "convmixer":
         if args.ablation == "patch_to_conv":
             return "./checkpoints/convmixer_patch_to_conv_best.pt"
-        if args.ablation == "mlp_channel":
-            return infer_mlp_save_path(args)
+        if args.ablation == "non_linear_channel_mix":
+            return infer_non_linear_channel_mix_save_path(args)
+        if args.ablation == "no_channel_mix":
+            return "./checkpoints/convmixer_no_channel_mix_best.pt"
         return "./checkpoints/convmixer_best.pt"
 
     return f"./checkpoints/{args.model}_best.pt"

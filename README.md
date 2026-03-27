@@ -67,13 +67,24 @@ uv run python experiments/train.py \
   --wandb enable
 ```
 
-Run ConvMixer with MLP channel ablation:
+Run ConvMixer with non-linear channel mixing ablation:
 
 ```bash
 uv run python experiments/train.py \
   --model convmixer \
-  --ablation mlp_channel \
-  --mlp-ratio 4.0 \
+  --ablation non_linear_channel_mix \
+  --mlp-ratio 1.0 \
+  --epochs 50 \
+  --batch-size 128 \
+  --wandb enable
+```
+
+Run ConvMixer with no-channel-mix ablation:
+
+```bash
+uv run python experiments/train.py \
+  --model convmixer \
+  --ablation no_channel_mix \
   --epochs 50 \
   --batch-size 128 \
   --wandb enable
