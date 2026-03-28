@@ -1,6 +1,6 @@
 \section{Ablation Study}
 
-The ablation code path is already prepared in the repository, and the current Weights \& Biases export already contains a first round of ablation results. These runs are useful for understanding the direction of the effects, although some comparisons remain preliminary because not every reference run was stopped at the same epoch.
+The current Weights \& Biases export contains a first round of ablation results. These runs are already sufficient to show clear qualitative trends, although some comparisons remain approximate because the corresponding reference runs did not all stop at the same epoch.
 
 These ablations are not arbitrary extensions. Each one targets a specific component that is easy to isolate in the ConvMixer design: the patch-forming front-end, the expressiveness of channel mixing, and the dependence of the model on training-set size. Together, they are meant to answer whether ConvMixer works well because of the exact combination proposed in the paper or because a broader family of simple patch-and-convolution hybrids is already strong on CIFAR-10.
 
@@ -37,7 +37,7 @@ These ablations are not arbitrary extensions. Each one targets a specific compon
 
 \subsection{Patch Stem Replacement}
 
-This subsection studies patch embedding vs.\ a convolutional stem. The ablation replaces the original patch embedding stem with a more conventional convolutional stem that preserves the downstream tensor shape. The goal is to test whether the patch projection itself is an important ingredient of ConvMixer, or whether a standard convolutional front-end can recover most of the same behavior once the later mixing blocks are unchanged.
+This subsection studies patch embedding vs.\ a convolutional stem. More specifically, it compares the original non-overlapping patch embedding used by ConvMixer against an overlapping convolutional stem that preserves the downstream tensor shape. The goal is to test whether the patch projection itself is an important ingredient of ConvMixer, or whether a standard convolutional front-end can recover most of the same behavior once the later mixing blocks are unchanged.
 
 The current exported run reaches best test accuracy $0.8870$ by epoch 31, which is very close to the base ConvMixer run at $0.8848$. This suggests that replacing the patch stem with a shape-compatible convolutional alternative does not obviously destroy performance in the current setup. At the same time, both the base ConvMixer run and this ablation were interrupted early, so the result should still be treated as preliminary.
 
@@ -45,7 +45,7 @@ The current exported run reaches best test accuracy $0.8870$ by epoch 31, which 
 
 This subsection studies pointwise channel mixing vs.\ non-linear channel mixing. The base ConvMixer block uses a single $1 \times 1$ convolution for channel mixing. The non-linear channel mixing ablation replaces that stage with a deeper non-linear mixer while keeping the rest of the block structure fixed. This tests whether the original pointwise mixer is sufficient, or whether additional channel-wise capacity materially changes performance.
 
-In the current export, this is the strongest ConvMixer-family run, reaching best test accuracy $0.9125$ after 50 epochs. On its face, this suggests that a deeper non-linear channel mixer can outperform the original pointwise convolution. The comparison is not perfectly controlled because the base ConvMixer run stopped much earlier, but the gain is large enough to justify further investigation.
+In the current export, this is the strongest ConvMixer-family run, reaching best test accuracy $0.9125$ after 50 epochs. On its face, this suggests that a deeper non-linear channel mixer can outperform the original pointwise convolution. However, this comparison also changes parameter count substantially: the non-linear channel variant has about $1.12$M trainable parameters, compared with about $0.59$M for the base ConvMixer. The gain is therefore interesting, but it should be interpreted as a joint effect of a richer mixer and a larger model rather than as a pure drop-in replacement.
 
 \subsection{No Channel Mixing}
 

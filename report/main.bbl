@@ -1,15 +1,9 @@
-\begin{thebibliography}{7}
+\begin{thebibliography}{5}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
-
-\bibitem[Deininger(2022)]{vitcnnstudy}
-et~al. Deininger.
-\newblock A comparative study between vision transformers and cnns in digital
-  pathology.
-\newblock 2022.
 
 \bibitem[He et~al.(2016)He, Zhang, Ren, and Sun]{he2016deep}
 Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun.
@@ -21,12 +15,6 @@ Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun.
 Alex Krizhevsky.
 \newblock Learning multiple layers of features from tiny images.
 \newblock Technical report, University of Toronto, 2009.
-
-\bibitem[Lu(2022)]{bridginggap}
-et~al. Lu.
-\newblock Bridging the gap between vision transformers and convolutional neural
-  networks on small datasets.
-\newblock 2022.
 
 \bibitem[Touvron et~al.(2021)Touvron, Cord, Douze, Massa, Sablayrolles, and
   J{\'e}gou]{touvron2021training}
