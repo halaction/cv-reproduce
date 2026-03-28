@@ -1,11 +1,11 @@
 \section{Main Experiment Results}
 
-Table~\ref{tab:main-results} summarizes the current three-model comparison. Exact values for best accuracy, completed epochs, and average epoch times should be copied from the finalized Weights \& Biases run summaries before submission. They are intentionally left as explicit placeholders in this draft to avoid estimating quantitative values from screenshots.
+Table~\ref{tab:main-results} summarizes the current three-model comparison using the exported Weights \& Biases results in \texttt{data/results.csv}. The table reports the best logged test accuracy, the final completed epoch in the exported run, and the final logged per-epoch timing values.
 
 \begin{table*}[t]
     \centering
     \small
-    \caption{Main CIFAR-10 comparison for the current reproduction pipeline. Parameter counts are exact for the present model definitions; the remaining metrics should be copied from the corresponding finalized Weights \& Biases runs.}
+    \caption{Main CIFAR-10 comparison for the current reproduction pipeline. Parameter counts come from the current model definitions; accuracy and timing metrics come from the exported Weights \& Biases summary table.}
     \label{tab:main-results}
     \begin{tabular}{lcccccc}
         \toprule
@@ -40,13 +40,13 @@ Table~\ref{tab:main-results} summarizes the current three-model comparison. Exac
     \label{fig:main-accuracy}
 \end{figure*}
 
-The qualitative ordering is already clear from the current logged runs. ConvMixer achieves the highest test accuracy in the present setup and reaches its plateau relatively quickly. ResNet18 remains competitive and substantially stronger than DeiT-Tiny, but it does not reach the same top accuracy as ConvMixer. DeiT-Tiny improves steadily, yet under the current training configuration it lags well behind the other two models on CIFAR-10.
+The quantitative ordering is clear in the exported results. ConvMixer reaches the best logged test accuracy of \convmixeracc, ResNet18 reaches \resnetacc, and DeiT-Tiny reaches only \deitacc. This means ConvMixer is ahead of ResNet18 by roughly four percentage points and ahead of DeiT-Tiny by almost twenty-five points in absolute test accuracy. Even in this compact CIFAR-10 setting, the ConvMixer design remains highly competitive.
 
-Runtime behavior tells a different story. The same Weights \& Biases workspace shows that ConvMixer is slower per training epoch than both ResNet18 and DeiT-Tiny in the current runs, even though it is much smaller than ResNet18 in parameter count. This suggests that the depthwise-plus-pointwise structure is not automatically the cheapest option in wall-clock terms under the present implementation and execution environment.
+Runtime behavior tells a different story. ConvMixer requires about \convmixertrainsec~seconds per training epoch, compared with \resnettrainsec~seconds for ResNet18 and \deittrainsec~seconds for DeiT-Tiny. Evaluation follows the same pattern: ConvMixer takes \convmixerevalsec~seconds per epoch, compared with \resnetevalsec~seconds for ResNet18 and \deitevalsec~seconds for DeiT-Tiny. This is notable because ConvMixer has only \convmixerparams{} trainable parameters, far fewer than ResNet18 (\resnetparams{}) and also fewer than DeiT-Tiny (\deitparams{}), yet it is still the slowest model in wall-clock terms in the current implementation.
 
-The result pattern is also consistent with the intended interpretation of the benchmark. ResNet18 benefits from a strong convolutional prior and remains a reliable baseline on small natural-image datasets. DeiT-Tiny, in contrast, is more sensitive to recipe details and may need a more specialized optimization setup to close the gap. ConvMixer occupies an interesting middle ground: it keeps explicit convolutional mixing while adopting patch-based processing, and in this reproduction that combination appears to be the most effective among the tested options.
+The result pattern is also consistent with the intended interpretation of the benchmark. ResNet18 benefits from a strong convolutional prior and remains a reliable baseline on small natural-image datasets, reaching \resnetacc{} despite being a conventional architecture. DeiT-Tiny, in contrast, is much weaker under the present recipe, which suggests that this shared small-scale training configuration is less favorable to the transformer-style baseline. ConvMixer occupies an interesting middle ground: it keeps explicit convolutional mixing while adopting patch-based processing, and in this reproduction that combination appears to be the most effective among the tested options.
 
-This comparison should still be interpreted with care. The current runs are useful for establishing a ranking inside one codebase, but they are not necessarily a perfectly matched benchmark. If the final ConvMixer, ResNet18, and DeiT-Tiny runs differ in epoch budget, scheduler horizon, or runtime backend, then the comparison remains valid as an empirical observation inside the reproduction pipeline but not as a fully controlled claim about architecture quality in general.
+This comparison should still be interpreted with care. The exported main runs did not stop at the same epoch: ConvMixer stopped at epoch \convmixerepochs, ResNet18 at epoch \resnetepochs, and DeiT-Tiny at epoch \deitepochs. In addition, the corresponding run states in the export are marked as killed rather than cleanly finished. The ranking is therefore meaningful as an observation from one shared codebase and logging setup, but it is not yet a fully controlled apples-to-apples benchmark with matched training budgets.
 
 \begin{figure*}[t]
     \centering
