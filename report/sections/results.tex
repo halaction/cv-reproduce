@@ -20,52 +20,39 @@ Table~\ref{tab:main-results} summarizes the current three-model comparison using
 
 \begin{figure*}[t]
     \centering
-    \IfFileExists{figures/main_accuracy.pdf}{
-        \includegraphics[width=0.95\textwidth]{figures/main_accuracy.pdf}
-    }{
-        \IfFileExists{figures/main_accuracy.png}{
-            \includegraphics[width=0.95\textwidth]{figures/main_accuracy.png}
-        }{
-            \fbox{
-                \parbox[c][2.1in][c]{0.92\textwidth}{
-                    \centering
-                    Export the Weights \& Biases plot for \texttt{best\_test\_accuracy} vs. epoch and save it as\\
-                    \texttt{report/figures/main\_accuracy.pdf} or \texttt{report/figures/main\_accuracy.png}.\\[0.6em]
-                    The fallback screenshot should include only the three final runs: ConvMixer, ResNet18, and DeiT-Tiny.
-                }
-            }
-        }
-    }
-    \caption{Main training comparison from Weights \& Biases. The preferred export is the \texttt{best\_test\_accuracy} plot for the three final runs.}
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/experiment-test-accuracy.png}
+        \caption{Test accuracy}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/experiment-test-loss.png}
+        \caption{Test loss}
+    \end{subfigure}
+
+    \vspace{0.6em}
+
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/experiment-train-accuracy.png}
+        \caption{Train accuracy}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/experiment-train-loss.png}
+        \caption{Train loss}
+    \end{subfigure}
+    \caption{Main experiment curves exported from Weights \& Biases for ConvMixer, ResNet18, and DeiT-Tiny. The test-accuracy panel is the primary comparison, while the remaining panels show optimization dynamics and loss behavior.}
     \label{fig:main-accuracy}
 \end{figure*}
 
-The quantitative ordering is clear in the exported results. ConvMixer reaches the best logged test accuracy of \convmixeracc, ResNet18 reaches \resnetacc, and DeiT-Tiny reaches only \deitacc. This means ConvMixer is ahead of ResNet18 by roughly four percentage points and ahead of DeiT-Tiny by almost twenty-five points in absolute test accuracy. Even in this compact CIFAR-10 setting, the ConvMixer design remains highly competitive.
+The quantitative ordering is clear in the exported results and is visible in Figure~\ref{fig:main-accuracy}. ConvMixer reaches the best logged test accuracy of \convmixeracc, ResNet18 reaches \resnetacc, and DeiT-Tiny reaches only \deitacc. This means ConvMixer is ahead of ResNet18 by roughly four percentage points and ahead of DeiT-Tiny by almost twenty-five points in absolute test accuracy. Even in this compact CIFAR-10 setting, the ConvMixer design remains highly competitive.
 
 Runtime behavior tells a different story. ConvMixer requires about \convmixertrainsec~seconds per training epoch, compared with \resnettrainsec~seconds for ResNet18 and \deittrainsec~seconds for DeiT-Tiny. Evaluation follows the same pattern: ConvMixer takes \convmixerevalsec~seconds per epoch, compared with \resnetevalsec~seconds for ResNet18 and \deitevalsec~seconds for DeiT-Tiny. This is notable because ConvMixer has only \convmixerparams{} trainable parameters, far fewer than ResNet18 (\resnetparams{}) and also fewer than DeiT-Tiny (\deitparams{}), yet it is still the slowest model in wall-clock terms in the current implementation.
 
-The result pattern is also consistent with the intended interpretation of the benchmark. ResNet18 benefits from a strong convolutional prior and remains a reliable baseline on small natural-image datasets, reaching \resnetacc{} despite being a conventional architecture. DeiT-Tiny, in contrast, is much weaker under the present recipe, which suggests that this shared small-scale training configuration is less favorable to the transformer-style baseline. ConvMixer occupies an interesting middle ground: it keeps explicit convolutional mixing while adopting patch-based processing, and in this reproduction that combination appears to be the most effective among the tested options.
+The result pattern is also consistent with the intended interpretation of the benchmark. ResNet18 benefits from a strong convolutional prior and remains a reliable baseline on small natural-image datasets, reaching \resnetacc{} despite being a conventional architecture. DeiT-Tiny, in contrast, is much weaker under the present recipe, which suggests that this shared small-scale training configuration is less favorable to the transformer-style baseline. ConvMixer occupies an interesting middle ground: it keeps explicit convolutional mixing while adopting patch-based processing, and in this reproduction that combination appears to be the most effective among the tested options. The loss panels in Figure~\ref{fig:main-accuracy} support the same reading: the better-performing models converge to lower loss, while DeiT-Tiny remains noticeably behind throughout training.
 
 This comparison should still be interpreted with care. The exported main runs did not stop at the same epoch: ConvMixer stopped at epoch \convmixerepochs, ResNet18 at epoch \resnetepochs, and DeiT-Tiny at epoch \deitepochs. In addition, the corresponding run states in the export are marked as killed rather than cleanly finished. The ranking is therefore meaningful as an observation from one shared codebase and logging setup, but it is not yet a fully controlled apples-to-apples benchmark with matched training budgets.
-
-\begin{figure*}[t]
-    \centering
-    \IfFileExists{figures/main_runtime.pdf}{
-        \includegraphics[width=0.95\textwidth]{figures/main_runtime.pdf}
-    }{
-        \IfFileExists{figures/main_runtime.png}{
-            \includegraphics[width=0.95\textwidth]{figures/main_runtime.png}
-        }{
-            \fbox{
-                \parbox[c][1.7in][c]{0.92\textwidth}{
-                    \centering
-                    Optional runtime figure. If space permits, export the Weights \& Biases comparison for\\
-                    \texttt{time/train\_sec} and \texttt{time/eval\_sec} and save it as\\
-                    \texttt{report/figures/main\_runtime.pdf} or \texttt{report/figures/main\_runtime.png}.
-                }
-            }
-        }
-    }
-    \caption{Optional runtime comparison from Weights \& Biases. This figure is useful if the final draft still has room after the main accuracy plot and result table.}
-    \label{fig:main-runtime}
-\end{figure*}

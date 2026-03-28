@@ -7,13 +7,15 @@
 
 \bibitem[Deininger(2022)]{vitcnnstudy}
 et~al. Deininger.
-\newblock A comparative study between vision transformers and cnns in digital pathology.
+\newblock A comparative study between vision transformers and cnns in digital
+  pathology.
 \newblock 2022.
 
 \bibitem[He et~al.(2016)He, Zhang, Ren, and Sun]{he2016deep}
 Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun.
 \newblock Deep residual learning for image recognition.
-\newblock In \emph{Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition}, pages 770--778, 2016.
+\newblock In \emph{Proceedings of the IEEE Conference on Computer Vision and
+  Pattern Recognition}, pages 770--778, 2016.
 
 \bibitem[Krizhevsky(2009)]{krizhevsky2009learning}
 Alex Krizhevsky.
@@ -22,13 +24,18 @@ Alex Krizhevsky.
 
 \bibitem[Lu(2022)]{bridginggap}
 et~al. Lu.
-\newblock Bridging the gap between vision transformers and convolutional neural networks on small datasets.
+\newblock Bridging the gap between vision transformers and convolutional neural
+  networks on small datasets.
 \newblock 2022.
 
-\bibitem[Touvron et~al.(2021)Touvron, Cord, Douze, Massa, Sablayrolles, and J{\'e}gou]{touvron2021training}
-Hugo Touvron, Matthieu Cord, Matthijs Douze, Francisco Massa, Alexandre Sablayrolles, and Herv{\'e} J{\'e}gou.
-\newblock Training data-efficient image transformers \& distillation through attention.
-\newblock In \emph{Proceedings of the International Conference on Machine Learning}, pages 10347--10357, 2021.
+\bibitem[Touvron et~al.(2021)Touvron, Cord, Douze, Massa, Sablayrolles, and
+  J{\'e}gou]{touvron2021training}
+Hugo Touvron, Matthieu Cord, Matthijs Douze, Francisco Massa, Alexandre
+  Sablayrolles, and Herv{\'e} J{\'e}gou.
+\newblock Training data-efficient image transformers \& distillation through
+  attention.
+\newblock In \emph{Proceedings of the International Conference on Machine
+  Learning}, pages 10347--10357, 2021.
 
 \bibitem[Trockman and Kolter(2022)]{trockman2022patches}
 Asher Trockman and J.~Zico Kolter.

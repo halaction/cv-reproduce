@@ -1,35 +1,60 @@
 \section{Ablation Study}
 
-The ablation code path is already prepared in the repository, but the full set of runs is still in progress. This section therefore records the intended experimental questions and leaves explicit space for the corresponding quantitative results.
+The ablation code path is already prepared in the repository, and the current Weights \& Biases export already contains a first round of ablation results. These runs are useful for understanding the direction of the effects, although some comparisons remain preliminary because not every reference run was stopped at the same epoch.
 
 These ablations are not arbitrary extensions. Each one targets a specific component that is easy to isolate in the ConvMixer design: the patch-forming front-end, the expressiveness of channel mixing, and the dependence of the model on training-set size. Together, they are meant to answer whether ConvMixer works well because of the exact combination proposed in the paper or because a broader family of simple patch-and-convolution hybrids is already strong on CIFAR-10.
 
-\subsection{Patch Embedding vs.\ Convolutional Stem}
+\begin{figure*}[t]
+    \centering
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/ablations-convmixer-test-accuracy.png}
+        \caption{ConvMixer architectural ablations}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/ablations-data-convmixer-test-accuracy.png}
+        \caption{ConvMixer under reduced data}
+    \end{subfigure}
 
-This ablation replaces the original patch embedding stem with a more conventional convolutional stem that preserves the downstream tensor shape. The goal is to test whether the patch projection itself is an important ingredient of ConvMixer, or whether a standard convolutional front-end can recover most of the same behavior once the later mixing blocks are unchanged.
+    \vspace{0.6em}
 
-Our working hypothesis is that the original patch-style stem is likely part of what makes ConvMixer distinctive, but the performance gap may be modest if the replacement stem remains shape-compatible and parameter-comparable. Results will be added after runs complete.
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/ablations-data-resnet-test-accuracy.png}
+        \caption{ResNet18 under reduced data}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/ablations-data-deit-test-accuracy.png}
+        \caption{DeiT-Tiny under reduced data}
+    \end{subfigure}
+    \caption{Ablation curves exported from Weights \& Biases. The upper-left panel compares ConvMixer variants directly, while the remaining panels show model behavior when the training set is reduced.}
+    \label{fig:ablations}
+\end{figure*}
 
-\subsection{Pointwise Channel Mixing vs.\ Non-Linear Channel Mixing}
+\subsection{Patch Stem Replacement}
 
-The base ConvMixer block uses a single $1 \times 1$ convolution for channel mixing. The non-linear channel mixing ablation replaces that stage with a deeper non-linear mixer while keeping the rest of the block structure fixed. This tests whether the original pointwise mixer is sufficient, or whether additional channel-wise capacity materially changes performance.
+This subsection studies patch embedding vs.\ a convolutional stem. The ablation replaces the original patch embedding stem with a more conventional convolutional stem that preserves the downstream tensor shape. The goal is to test whether the patch projection itself is an important ingredient of ConvMixer, or whether a standard convolutional front-end can recover most of the same behavior once the later mixing blocks are unchanged.
 
-The expected outcome is that this variant may improve flexibility but does not necessarily improve accuracy enough to justify its added complexity on CIFAR-10. Results will be added after runs complete.
+The current exported run reaches best test accuracy $0.8870$ by epoch 31, which is very close to the base ConvMixer run at $0.8848$. This suggests that replacing the patch stem with a shape-compatible convolutional alternative does not obviously destroy performance in the current setup. At the same time, both the base ConvMixer run and this ablation were interrupted early, so the result should still be treated as preliminary.
 
-\subsection{Pointwise Channel Mixing vs.\ No Channel Mixing}
+\subsection{Non-Linear Channel Mixing}
 
-This ablation removes the channel mixing stage entirely by replacing it with an identity mapping. It is the cleanest way to test whether the pointwise mixing path is essential, because the spatial depthwise branch and the classifier head remain intact.
+This subsection studies pointwise channel mixing vs.\ non-linear channel mixing. The base ConvMixer block uses a single $1 \times 1$ convolution for channel mixing. The non-linear channel mixing ablation replaces that stage with a deeper non-linear mixer while keeping the rest of the block structure fixed. This tests whether the original pointwise mixer is sufficient, or whether additional channel-wise capacity materially changes performance.
 
-The expected outcome is a noticeable drop in accuracy, which would support the interpretation that ConvMixer requires both spatial and channel mixing rather than spatial processing alone. Results will be added after runs complete.
+In the current export, this is the strongest ConvMixer-family run, reaching best test accuracy $0.9125$ after 50 epochs. On its face, this suggests that a deeper non-linear channel mixer can outperform the original pointwise convolution. The comparison is not perfectly controlled because the base ConvMixer run stopped much earlier, but the gain is large enough to justify further investigation.
+
+\subsection{No Channel Mixing}
+
+This subsection studies pointwise channel mixing vs.\ no channel mixing. The ablation removes the channel mixing stage entirely by replacing it with an identity mapping. It is the cleanest way to test whether the pointwise mixing path is essential, because the spatial depthwise branch and the classifier head remain intact.
+
+This ablation shows a large drop, reaching only $0.7421$ best test accuracy after 50 epochs. The difference from both the base model and the non-linear channel variant strongly supports the claim that channel mixing is essential: spatial depthwise processing alone is not enough to recover ConvMixer performance.
 
 \subsection{Data-Size Robustness}
 
-It is assumed that transformers require a bigger amount of data than convolutional networks, when trained from scratch. Not only this claim is supported by the existing research (such as \citep{vitcnnstudy}), there are papers dedicated to bridge this gap (such as \citep{bridginggap}).
+This ablation evaluates all three model families with 50\%, 10\%, and 1\% of the CIFAR-10 training set, while keeping the full test set. The resulting trends are shown in Figure~\ref{fig:ablations}. As expected, all models degrade as data becomes scarce. At 50\% data, ConvMixer reaches $0.8407$, ResNet18 reaches $0.7896$, and DeiT-Tiny reaches $0.5401$. At 10\%, the ordering remains the same: ConvMixer reaches $0.6637$, ResNet18 reaches $0.6466$, and DeiT-Tiny reaches $0.3965$. At 1\%, the models collapse further, but ConvMixer still leads with $0.4077$, followed by ResNet18 at $0.3760$ and DeiT-Tiny at $0.3000$.
 
-In fact, it might be that the poor performance of DeiT-Tiny in the main experiment could be attributed to the fact that CIFAR-10 is already a relatively small dataset, compared to ImageNet that was used in the original paper, and other datasets commonly used to teach transformers image classification.
-
-Our final ablation evaluates how convmixer trains when using  smaller amounts of training data, and how it compares to Resnet-18 and DeiT-Tiny in that respect. For this experiment, we take 50\%, 10\% and 1\% of training set of CIFAR-10, and train each of the models on the limited data for 50 epochs. At the same time, we use the whole test dataset.
-
-The results are expected and similar to the main experiment outcome. Of course, the smaller the data, the worse the performance of a model. However, with 50\% of the training set, the fall in test accuracy is not so catastrophic, with models trailing behind by just about 6\% to 7\%. 
-
-Something interesting can be observed when training at just 1\% of data: surprisingly, DeiT-Tiny starts with better accuracy after the first epoch (about 17\% compared to about 10\% for convolutional models) and its training looks more stable. Eventually, after about 20 epochs, the convolutional models do outperform DeiT-Tiny as in other runs.
+The small-data results are therefore consistent with the main experiment ranking rather than overturning it. ConvMixer remains the strongest model across all tested fractions, and ResNet18 remains second. DeiT-Tiny shows some early movement in the curve visualizations, but by the end of training it is still the weakest model at every data level in the current setup.
