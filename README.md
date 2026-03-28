@@ -2,12 +2,15 @@
 
 Reproduced paper: https://arxiv.org/pdf/2201.09792
 
+Report is placed at `report/main.pdf`.
+
 Main experiment: Running Convmixer, ResNet and ViT on CIFAR10.
 
 Ablations:
-1) Partial dataset - running the same models only with the part of CIFAR10. It is assumed that target architecture (Convmixer) will show better robustness.
-2) Remove patches - replace patch embedding with a simple convolution sequence, which matches the output dimensions.
-3) Remove mixing - ?
+1) Remove patches - replace patch embedding with a simple convolution sequence, which matches the output dimensions.
+2) Non-linear channel mixing - replace linear channel mixing with its non-linear variant (two convolution with a non-linearity in between).
+3) No channel mixing - replace linear channel mixing with an identity function.
+4) Partial dataset - running the same models only with the part of CIFAR10. It is assumed that target architecture (Convmixer) will show better robustness.
 
 ## Training
 
@@ -22,7 +25,7 @@ Optional `.env` for WandB (`--wandb enable`):
 ```bash
 cat > .env << 'EOF'
 WANDB_PROJECT=cv-reproduce
-WANDB_ENTITY=your_wandb_username_or_team
+WANDB_ENTITY=halaction
 EOF
 ```
 
