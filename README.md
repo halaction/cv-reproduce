@@ -92,3 +92,15 @@ uv run python experiments/train.py \
   --batch-size 128 \
   --wandb enable
 ```
+
+Run with data size ablation (`$FRACTION` is from range `(0.0, 1.0]`, `$MODEL` is one of `convmixer`, `resnet18`, `deit_tiny`):
+```bash
+uv run python experiments/train.py \
+  --model $MODEL \
+  --ablation data_size \
+  --fraction $FRACTION \
+  --seed 42 \
+  --epochs 50 \
+  --batch-size 128 \
+  --wandb enable
+```
